@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useMounted } from "@/hooks/use-mounted";
 import { usePrefersReducedMotion } from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";
@@ -28,6 +28,21 @@ export function EmberParticles({
 }) {
   const mounted = useMounted();
   const reduced = usePrefersReducedMotion();
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(true);
+
+  // Pause the CSS animations while the section is off-screen so embers in
+  // lower sections don't burn frames when you're elsewhere on the page.
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => setVisible(entry.isIntersecting),
+      { rootMargin: "120px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [mounted]);
 
   // Deterministic pseudo-random keeps the render pure (no Math.random in
   // render) and gives stable, varied particles without SSR/CSR mismatch.
@@ -50,6 +65,7 @@ export function EmberParticles({
 
   return (
     <div
+      ref={ref}
       aria-hidden
       className={cn(
         "pointer-events-none absolute inset-0 overflow-hidden",
@@ -65,10 +81,13 @@ export function EmberParticles({
             width: e.size,
             height: e.size,
             opacity: e.opacity,
+            // A wider soft radial gradient gives the glow without the
+            // per-frame repaint cost of animating box-shadow.
             background:
-              "radial-gradient(circle, #ffd27a 0%, #ff6b00 55%, transparent 70%)",
-            boxShadow: "0 0 8px 1px rgba(255,107,0,0.6)",
+              "radial-gradient(circle, #ffd27a 0%, #ff6b00 45%, rgba(255,107,0,0.35) 60%, transparent 75%)",
+            willChange: "transform, opacity",
             animation: `ember-rise ${e.duration}s linear ${e.delay}s infinite`,
+            animationPlayState: visible ? "running" : "paused",
             ["--drift" as string]: `${e.drift}px`,
           }}
         />

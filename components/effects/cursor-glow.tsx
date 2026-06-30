@@ -35,13 +35,14 @@ export function CursorGlow() {
         y: sy,
         translateX: "-50%",
         translateY: "-50%",
+        willChange: "transform",
       }}
     >
       <div
-        className="h-[420px] w-[420px] rounded-full mix-blend-screen"
+        className="h-[340px] w-[340px] rounded-full"
         style={{
           background:
-            "radial-gradient(circle, rgba(255,107,0,0.12), rgba(249,168,38,0.06) 40%, transparent 70%)",
+            "radial-gradient(circle, rgba(255,107,0,0.10), rgba(249,168,38,0.05) 40%, transparent 70%)",
         }}
       />
     </motion.div>

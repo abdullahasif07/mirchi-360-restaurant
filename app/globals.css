@@ -140,18 +140,27 @@ h4 {
     animation: fire-shift 8s ease infinite;
   }
 
-  /* Glassmorphism card */
+  /* Glassmorphism card.
+     Reduced blur radius keeps backdrop-filter cheap to repaint while the
+     page scrolls (large blur radii are a common scroll-jank source). */
   .glass {
-    background: color-mix(in srgb, var(--color-card) 60%, transparent);
-    backdrop-filter: blur(16px) saturate(140%);
-    -webkit-backdrop-filter: blur(16px) saturate(140%);
+    background: color-mix(in srgb, var(--color-card) 72%, transparent);
+    backdrop-filter: blur(10px) saturate(135%);
+    -webkit-backdrop-filter: blur(10px) saturate(135%);
     border: 1px solid color-mix(in srgb, var(--color-ink) 8%, transparent);
   }
 
   .glass-strong {
-    background: color-mix(in srgb, #0f0f0f 78%, transparent);
-    backdrop-filter: blur(20px) saturate(160%);
-    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    background: color-mix(in srgb, #0f0f0f 86%, transparent);
+    backdrop-filter: blur(12px) saturate(150%);
+    -webkit-backdrop-filter: blur(12px) saturate(150%);
+  }
+
+  /* Promote an element to its own GPU layer for transform/opacity anims. */
+  .gpu {
+    will-change: transform;
+    transform: translateZ(0);
+    backface-visibility: hidden;
   }
 
   /* Warm radial glow used behind sections */
@@ -280,6 +289,16 @@ h4 {
 /* ------------------------------------------------------------------ */
 /*  Accessibility: reduced motion                                      */
 /* ------------------------------------------------------------------ */
+/* Backdrop-filter is expensive on mobile GPUs; the glass backgrounds are
+   opaque enough to drop the blur there without a noticeable visual change. */
+@media (max-width: 768px) {
+  .glass,
+  .glass-strong {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
