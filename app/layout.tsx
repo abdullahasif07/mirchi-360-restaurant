@@ -6,6 +6,7 @@ import { SmoothScroll } from "@/components/effects/smooth-scroll";
 import { CursorGlow } from "@/components/effects/cursor-glow";
 import { ScrollProgress } from "@/components/effects/scroll-progress";
 import { LoadingScreen } from "@/components/effects/loading-screen";
+import { AutoScrollButton } from "@/components/effects/auto-scroll-button";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -99,6 +100,9 @@ export default function RootLayout({
         <LoadingScreen />
         <ScrollProgress />
         <CursorGlow />
+        {/* Recording helper: slow auto-scroll button (bottom-left).
+            To hide it in production, gate on a URL flag or remove this line. */}
+        <AutoScrollButton />
 
         <SmoothScroll>{children}</SmoothScroll>
       </body>

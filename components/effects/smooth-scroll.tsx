@@ -4,6 +4,13 @@ import { useEffect } from "react";
 import Lenis from "lenis";
 import { usePrefersReducedMotion } from "@/hooks/use-media-query";
 
+declare global {
+  interface Window {
+    /** Active Lenis instance, exposed for helpers like the auto-scroller. */
+    __lenis?: Lenis;
+  }
+}
+
 /**
  * Lenis smooth scrolling provider. Wraps the app and drives the RAF loop.
  * Disabled when the user prefers reduced motion.
@@ -20,6 +27,7 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
       smoothWheel: true,
       touchMultiplier: 1.6,
     });
+    window.__lenis = lenis;
 
     let frame = 0;
     const raf = (time: number) => {
@@ -48,6 +56,7 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
       cancelAnimationFrame(frame);
       document.removeEventListener("click", onClick);
       lenis.destroy();
+      if (window.__lenis === lenis) delete window.__lenis;
     };
   }, [reduced]);
 
